@@ -1,0 +1,97 @@
+# EMILY WHITE
+
+**Software Engineer | Recent Graduate**
+
+Austin, TX | (512) 555-0147 | [jordan.miller@email.com](mailto:emily.white@email.com)
+LinkedIn: linkedin.com/in/jordanmiller | GitHub: github.com/jordanmiller
+
+---
+
+## SUMMARY
+
+Recent Software Engineering graduate with a solid foundation in programming, software development, databases, and web technologies. Experienced through academic and personal projects in building applications, debugging code, and working with development tools. Strong problem-solving skills with an interest in learning new technologies and contributing to a software development team.
+
+---
+
+## EDUCATION
+
+**Bachelor of Science in Software Engineering**
+University of Texas at Arlington — Arlington, TX
+May 2026
+
+Relevant Coursework: Data Structures & Algorithms, Database Systems, Software Engineering, Object-Oriented Programming, Computer Networks
+
+---
+
+## TECHNICAL SKILLS
+
+**Languages:** Python, Java, C++, JavaScript, SQL
+**Web:** HTML, CSS, React
+**Databases:** MySQL, PostgreSQL
+**Tools:** Git, GitHub, Visual Studio Code, Postman
+**Concepts:** Object-Oriented Programming, REST APIs, Data Structures, Debugging, Version Control
+
+---
+
+## PROJECTS
+
+### Student Task Management Application
+
+**Python, Flask, SQLite, HTML, CSS**
+
+* Developed a simple web application for creating, updating, and tracking tasks.
+* Implemented basic CRUD operations using SQLite.
+* Created REST endpoints for handling application requests.
+* Tested and debugged application functionality during development.
+
+### Personal Expense Tracker
+
+**JavaScript, HTML, CSS**
+
+* Built a browser-based application for recording and organizing personal expenses.
+* Added functionality to categorize expenses and calculate spending totals.
+* Designed a simple and responsive user interface.
+* Used JavaScript to handle user input and update information dynamically.
+
+### Library Management System
+
+**Java, MySQL**
+
+* Developed a basic application for managing books, members, and borrowing records.
+* Designed database tables and wrote SQL queries for storing and retrieving information.
+* Implemented features for adding books, registering members, and recording loans.
+* Applied object-oriented programming concepts throughout the project.
+
+---
+
+## EXPERIENCE
+
+### Software Development Intern
+
+**Tech Solutions Inc. — Austin, TX**
+June 2025 – August 2025
+
+* Assisted developers with testing and debugging software applications.
+* Worked on small feature updates and bug fixes.
+* Used Git and GitHub for version control and collaboration.
+* Helped test REST API endpoints using Postman.
+* Participated in team meetings and learned the company's development workflow.
+
+---
+
+## ACTIVITIES
+
+**Computer Science Club — Member**
+University of Texas at Arlington
+2024 – 2026
+
+* Participated in programming workshops and student technology events.
+* Worked with other students on small coding projects.
+
+---
+
+## ADDITIONAL
+
+* Comfortable working independently or as part of a development team.
+* Strong willingness to learn new technologies and development practices.
+* Authorized to work in the United States.

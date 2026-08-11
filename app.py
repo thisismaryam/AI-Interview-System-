@@ -134,7 +134,7 @@ def _advance(answer):
             state = finalize(state)
             return jsonify({
                 "done": True,
-                "overall_score": state["overall_score"],
+                "overall_score": state.get("final_score", 0.0),
                 "topic_scores": state["final_scores"],
                 "feedback": state["feedback"],
                 "transcript": [

@@ -44,9 +44,9 @@ class InterviewState(TypedDict):
     question_count: int
     final_score: float
     feedback: str
-    covered_topics: List[str]          # ✅ Track topics already asked
+    covered_topics: List[str]  # Track topics already asked
     follow_up_in_progress: bool
-    # ✅ Track if current question already had a follow-up
+    #  Track if current question already had a follow-up
     follow_up_used: bool
 
 # ==================== Helper Functions ====================
@@ -66,7 +66,7 @@ def call_llm(prompt: str, expect_number: bool = False) -> str:
             return numbers[0] if numbers else "5.0"
         return content if content else "Tell me more about your experience."
     except Exception as e:
-        print(f"⚠️ LLM Error: {e}")
+        print(f" LLM Error: {e}")
         return "5.0" if expect_number else "Tell me more about your experience."
 
 
@@ -179,7 +179,7 @@ def ask_question(state: InterviewState):
         # Mark that we used follow-up on this question
         state["follow_up_used"] = True
         print(
-            f"🔄 Follow-up {state['question_count']+1}/{state['max_questions']}")
+            f"Follow-up {state['question_count']+1}/{state['max_questions']}")
     else:
         # New question - mark follow-up used as False for next round
         state["follow_up_used"] = False
@@ -193,7 +193,7 @@ def ask_question(state: InterviewState):
                 state["covered_topics"].append(topic)
         state["follow_up_in_progress"] = False
         print(
-            f"📝 New question {state['question_count']+1}/{state['max_questions']}")
+            f" New question {state['question_count']+1}/{state['max_questions']}")
 
     # Fallback if question is empty
     if not question or question.strip() == "":
@@ -245,7 +245,7 @@ def evaluate(state: InterviewState):
 def finalize(state: InterviewState):
     """Score EVERYTHING at the end."""
 
-    print("\n📊 Evaluating entire interview...")
+    print("\n Evaluating entire interview...")
 
     # Build full conversation
     conv = ""
