@@ -1,0 +1,48 @@
+# JOB OFFER
+
+**Position:** Software Developer
+**Employment Type:** Full-Time
+**Location:** Peshawar, Pakistan
+
+Dear Candidate,
+
+We are pleased to offer you the position of **Software Developer** at our organization.
+
+In this role, you will be responsible for assisting with the development, testing, and maintenance of software applications. You will work with the development team to implement features, fix bugs, write clean and maintainable code, and support ongoing software projects.
+
+### Key Responsibilities
+
+* Develop and maintain software applications under the guidance of senior developers.
+* Write, test, and debug code.
+* Assist in implementing new features and improvements.
+* Identify and fix basic software issues and bugs.
+* Work with databases and APIs when required.
+* Participate in code reviews and team discussions.
+* Follow development standards and project requirements.
+* Learn and work with technologies used by the development team.
+
+### Required Qualifications
+
+* Bachelor's degree in Computer Science, Software Engineering, Computer Systems Engineering, or a related field.
+* Basic understanding of programming concepts.
+* Familiarity with at least one programming language such as Python, Java, C++, or JavaScript.
+* Basic knowledge of databases and software development practices.
+* Good problem-solving and communication skills.
+* Willingness to learn new technologies and work as part of a team.
+
+### Compensation & Benefits
+
+* **Salary:** PKR 60,000 per month
+* Paid leave according to company policy.
+* Professional learning and development opportunities.
+* Supportive and collaborative work environment.
+
+### Joining
+
+The selected candidate is expected to join according to the mutually agreed joining date.
+
+We look forward to welcoming you to our team and supporting your growth as a Software Developer.
+
+**Sincerely,**
+**HR Department**
+**[Company Name]**

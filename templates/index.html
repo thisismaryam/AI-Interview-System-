@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Interview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F2F4F3;
+            --surface: #FFFFFF;
+            --border: #E1E6E4;
+            --ink: #1C2321;
+            --ink-muted: #626E6A;
+            --accent: #2F6F63;
+            --accent-dim: #E7EFED;
+            --signal: #C1440E;
+            --signal-dim: #FBE9E1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            font-family: 'Inter', system-ui, sans-serif;
+            color: var(--ink);
+            padding: 24px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 620px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px 44px;
+        }
+
+        .eyebrow {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin: 0 0 12px 0;
+        }
+
+        h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 32px;
+            font-weight: 500;
+            margin: 0 0 28px 0;
+            letter-spacing: -0.01em;
+        }
+
+        .progress {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .dot {
+            width: 28px;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border);
+            transition: background 0.3s ease;
+        }
+
+        .dot.done {
+            background: var(--accent);
+        }
+
+        .dot.current {
+            background: var(--signal);
+        }
+
+        .question-box {
+            min-height: 88px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        #question {
+            font-family: 'Fraunces', serif;
+            font-size: 22px;
+            font-weight: 400;
+            line-height: 1.45;
+            margin: 0;
+        }
+
+        #status {
+            font-size: 14px;
+            color: var(--ink-muted);
+            min-height: 20px;
+            margin: 0 0 28px 0;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            font-family: 'Inter', system-ui, sans-serif;
+            font-weight: 500;
+            font-size: 15px;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 26px;
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.2s ease;
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        #startBtn,
+        #recordBtn,
+        #uploadBtn {
+            background: var(--accent);
+            color: white;
+        }
+
+        #startBtn:hover,
+        #recordBtn:hover,
+        #uploadBtn:hover {
+            background: #275c52;
+        }
+
+        #stopBtn {
+            background: var(--signal);
+            color: white;
+        }
+
+        #stopBtn:hover {
+            background: #a3390c;
+        }
+
+        .mic-ring {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--signal);
+            display: none;
+            position: relative;
+        }
+
+        .mic-ring.active {
+            display: block;
+        }
+
+        .mic-ring::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            background: var(--signal-dim);
+            animation: pulse 1.4s ease-out infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.6);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: scale(2.2);
+                opacity: 0;
+            }
+        }
+
+        /* Upload styles */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 40px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 16px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        .upload-area .icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .upload-area p {
+            color: var(--ink-muted);
+            font-size: 14px;
+        }
+
+        .upload-area strong {
+            color: var(--ink);
+        }
+
+        .upload-area .hint {
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-info {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--accent-dim);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .file-info.visible {
+            display: flex;
+        }
+
+        .file-name {
+            flex: 1;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: var(--ink-muted);
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: var(--signal);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 4px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Report */
+        .report h1 {
+            margin-bottom: 6px;
+        }
+
+        .report .eyebrow {
+            margin-bottom: 4px;
+        }
+
+        .turn {
+            border-top: 1px solid var(--border);
+            padding: 18px 0;
+        }
+
+        .turn:last-child {
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .turn-q {
+            font-family: 'Fraunces', serif;
+            font-size: 16px;
+            margin: 0 0 6px 0;
+        }
+
+        .turn-a {
+            font-size: 14px;
+            color: var(--ink-muted);
+            margin: 0 0 10px 0;
+            line-height: 1.5;
+        }
+
+        .score-track {
+            height: 6px;
+            background: var(--accent-dim);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .score-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--ink-muted);
+            margin-top: 6px;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 24px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .controls button {
+                width: 100%;
+            }
+
+            .upload-area {
+                padding: 24px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card" id="card">
+
+        <!-- UPLOAD SCREEN -->
+        <div id="uploadScreen">
+            <p class="eyebrow">AI Technical Interview</p>
+            <h1>Start Your Interview</h1>
+            <p style="color: var(--ink-muted); margin-bottom: 20px;">Upload your resume to begin the AI-powered
+                interview.</p>
+
+            <div class="upload-area" id="uploadArea">
+                <span class="icon">📄</span>
+                <p><strong>Click to upload</strong> or drag and drop</p>
+                <p class="hint">PDF, DOCX, DOC, or TXT (max 10MB)</p>
+                <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt">
+            </div>
+
+            <div class="file-info" id="fileInfo">
+                <span>📎</span>
+                <span class="file-name" id="fileName">resume.pdf</span>
+                <span class="file-size" id="fileSize">2.4 MB</span>
+                <button class="remove-file" id="removeFileBtn">✕</button>
+            </div>
+
+            <div id="uploadStatus" style="font-size:14px;color:var(--ink-muted);margin-bottom:16px;"></div>
+
+            <button id="uploadBtn" style="width:100%;" disabled>
+                <span id="uploadBtnText">Upload Resume</span>
+            </button>
+        </div>
+
+        <!-- INTERVIEW SCREEN -->
+        <div id="interviewScreen" class="hidden">
+            <p class="eyebrow">AI Technical Interview</p>
+            <h1>Voice Interview</h1>
+
+            <div class="progress" id="progress"></div>
+
+            <div class="question-box">
+                <p id="question">Click "Start Interview" when you're ready to begin.</p>
+            </div>
+            <p id="status"></p>
+
+            <div class="controls">
+                <button id="startBtn">Start Interview</button>
+                <button id="recordBtn" style="display:none;">Start Recording</button>
+                <button id="stopBtn" style="display:none;">Stop &amp; Submit</button>
+                <div class="mic-ring" id="micRing"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ===== UPLOAD =====
+        let selectedFile = null;
+
+        const uploadScreen = document.getElementById('uploadScreen');
+        const interviewScreen = document.getElementById('interviewScreen');
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadBtnText = document.getElementById('uploadBtnText');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeFileBtn = document.getElementById('removeFileBtn');
+        const uploadStatus = document.getElementById('uploadStatus');
+
+        function showUploadStatus(msg, type = 'info') {
+            uploadStatus.textContent = msg;
+            uploadStatus.style.color = type === 'error' ? '#C1440E' : type === 'success' ? '#2F6F63' : '#626E6A';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        function handleFile(file) {
+            if (!file) return;
+            const ext = file.name.match(/\.[^.]+$/)?.[0]?.toLowerCase() || '';
+            if (!['.pdf', '.docx', '.doc', '.txt'].includes(ext)) {
+                showUploadStatus('Please upload a PDF, DOCX, DOC, or TXT file.', 'error');
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                showUploadStatus('File size exceeds 10MB limit.', 'error');
+                return;
+            }
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.add('visible');
+            uploadBtn.disabled = false;
+            showUploadStatus('Ready to upload.', 'success');
+        }
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.style.borderColor = 'var(--accent)'; });
+        uploadArea.addEventListener('dragleave', () => { uploadArea.style.borderColor = 'var(--border)'; });
+        uploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--border)';
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+        removeFileBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            fileInfo.classList.remove('visible');
+            uploadBtn.disabled = true;
+            showUploadStatus('Please select a file.', 'info');
+        });
+
+        uploadBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            uploadBtn.disabled = true;
+            uploadBtnText.textContent = 'Uploading...';
+            showUploadStatus('Uploading and parsing resume...', 'info');
+
+            const formData = new FormData();
+            formData.append('resume', selectedFile);
+
+            try {
+                const response = await fetch('/upload-resume', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Upload failed');
+
+                showUploadStatus('✅ Resume uploaded successfully!', 'success');
+
+                setTimeout(() => {
+                    uploadScreen.classList.add('hidden');
+                    interviewScreen.classList.remove('hidden');
+                    renderProgress(0);
+                    statusEl.textContent = 'Ready to start the interview!';
+                }, 800);
+
+            } catch (error) {
+                showUploadStatus('❌ ' + error.message, 'error');
+                uploadBtn.disabled = false;
+                uploadBtnText.textContent = 'Upload Resume';
+            }
+        });
+
+        // ===== INTERVIEW =====
+        const TOTAL_QUESTIONS = 5;
+
+        const card = document.getElementById("card");
+        const questionEl = document.getElementById("question");
+        const statusEl = document.getElementById("status");
+        const startBtn = document.getElementById("startBtn");
+        const recordBtn = document.getElementById("recordBtn");
+        const stopBtn = document.getElementById("stopBtn");
+        const micRing = document.getElementById("micRing");
+        const progressEl = document.getElementById("progress");
+
+        let turnIndex = 0;
+
+        function renderProgress(current) {
+            progressEl.innerHTML = "";
+            for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+                const dot = document.createElement("div");
+                dot.className = "dot" + (i < current ? " done" : i === current ? " current" : "");
+                progressEl.appendChild(dot);
+            }
+        }
+
+        startBtn.onclick = async () => {
+            statusEl.textContent = "Starting...";
+            startBtn.disabled = true;
+            try {
+                const res = await fetch("/start", { method: "POST" });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                questionEl.textContent = data.question;
+                statusEl.textContent = "The interviewer is speaking...";
+                startBtn.style.display = "none";
+                recordBtn.style.display = "inline-block";
+                renderProgress(0);
+            } catch (e) {
+                statusEl.textContent = "❌ Error: " + e.message;
+                startBtn.disabled = false;
+            }
+        };
+
+        recordBtn.onclick = async () => {
+            statusEl.textContent = "Recording — speak your answer now.";
+            micRing.classList.add("active");
+            recordBtn.disabled = true;
+            try {
+                await fetch("/start-recording", { method: "POST" });
+                recordBtn.style.display = "none";
+                stopBtn.style.display = "inline-block";
+            } catch (e) {
+                statusEl.textContent = "❌ Error: " + e.message;
+                micRing.classList.remove("active");
+                recordBtn.disabled = false;
+            }
+        };
+
+        stopBtn.onclick = async () => {
+            statusEl.textContent = "Processing your answer...";
+            stopBtn.disabled = true;
+            micRing.classList.remove("active");
+
+            try {
+                const res = await fetch("/stop-recording", { method: "POST" });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                stopBtn.disabled = false;
+                stopBtn.style.display = "none";
+                turnIndex++;
+
+                if (data.done) {
+                    renderProgress(TOTAL_QUESTIONS);
+                    renderReport(data.transcript);
+                } else {
+                    questionEl.textContent = data.question;
+                    statusEl.textContent = "The interviewer is speaking...";
+                    recordBtn.style.display = "inline-block";
+                    recordBtn.disabled = false;
+                    renderProgress(turnIndex);
+                }
+            } catch (e) {
+                statusEl.textContent = "❌ Error: " + e.message;
+                stopBtn.disabled = false;
+                stopBtn.style.display = "none";
+                recordBtn.style.display = "inline-block";
+                recordBtn.disabled = false;
+            }
+        };
+
+        function renderReport(transcript) {
+            const avg = transcript.reduce((s, t) => s + t.score, 0) / transcript.length;
+
+            let html = `
+                <p class="eyebrow">Interview Complete</p>
+                <h1>Thank you.</h1>
+                <p style="color: var(--ink-muted); margin-bottom: 28px;">
+                  Average relevance score: <strong style="color: var(--ink);">${avg.toFixed(1)}/10</strong>
+                </p>
+            `;
+
+            transcript.forEach((t, i) => {
+                html += `
+                    <div class="turn">
+                        <p class="turn-q">${i + 1}. ${t.question}</p>
+                        <p class="turn-a">${t.answer || "(no answer recorded)"}</p>
+                        <div class="score-track"><div class="score-fill" style="width:${t.score * 10}%"></div></div>
+                        <p class="score-label">${t.score.toFixed(1)} / 10</p>
+                    </div>
+                `;
+            });
+
+            html += `<button onclick="location.reload()" style="width:100%;background:var(--accent);color:white;padding:14px;border:none;border-radius:10px;font-size:15px;cursor:pointer;">🔄 New Interview</button>`;
+
+            card.innerHTML = `<div class="report">${html}</div>`;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && stopBtn.style.display !== 'none') stopBtn.click();
+            if (e.key === ' ' && recordBtn.style.display !== 'none') {
+                e.preventDefault();
+                recordBtn.click();
+            }
+        });
+    </script>
+
+</body>
+
+</html>

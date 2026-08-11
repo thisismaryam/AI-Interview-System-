@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice Interview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F2F4F3;
+    --surface: #FFFFFF;
+    --border: #E1E6E4;
+    --ink: #1C2321;
+    --ink-muted: #626E6A;
+    --accent: #2F6F63;
+    --accent-dim: #E7EFED;
+    --signal: #C1440E;
+    --signal-dim: #FBE9E1;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--ink);
+    padding: 24px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 620px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 44px;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 12px 0;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 500;
+    margin: 0 0 28px 0;
+    letter-spacing: -0.01em;
+  }
+
+  .progress {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .dot {
+    width: 28px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    transition: background 0.3s ease;
+  }
+
+  .dot.done { background: var(--accent); }
+  .dot.current { background: var(--signal); }
+
+  .question-box {
+    min-height: 88px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  #question {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  #status {
+    font-size: 14px;
+    color: var(--ink-muted);
+    min-height: 20px;
+    margin: 0 0 28px 0;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  button {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 26px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+
+  button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.5; cursor: default; }
+
+  #startBtn, #recordBtn {
+    background: var(--accent);
+    color: white;
+  }
+  #startBtn:hover, #recordBtn:hover { background: #275c52; }
+
+  #stopBtn {
+    background: var(--signal);
+    color: white;
+  }
+  #stopBtn:hover { background: #a3390c; }
+
+  .mic-ring {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--signal);
+    display: none;
+    position: relative;
+  }
+
+  .mic-ring.active { display: block; }
+
+  .mic-ring::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: var(--signal-dim);
+    animation: pulse 1.4s ease-out infinite;
+  }
+
+  @keyframes pulse {
+    0%   { transform: scale(0.6); opacity: 0.9; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  /* final report */
+  .report h1 { margin-bottom: 6px; }
+  .report .eyebrow { margin-bottom: 4px; }
+
+  .turn {
+    border-top: 1px solid var(--border);
+    padding: 18px 0;
+  }
+  .turn:last-child { border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+
+  .turn-q {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    margin: 0 0 6px 0;
+  }
+  .turn-a {
+    font-size: 14px;
+    color: var(--ink-muted);
+    margin: 0 0 10px 0;
+    line-height: 1.5;
+  }
+  .score-track {
+    height: 6px;
+    background: var(--accent-dim);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .score-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+  }
+  .score-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="card" id="card">
+    <p class="eyebrow">AI Technical Interview</p>
+    <h1>Voice Interview</h1>
+
+    <div class="progress" id="progress"></div>
+
+    <div id="uploadStep">
+      <p id="question">Upload the candidate's resume to begin.</p>
+      <p id="status"></p>
+      <div class="controls">
+        <input type="file" id="resumeInput" accept=".pdf,.docx,.txt">
+        <button id="uploadBtn">Upload Resume</button>
+      </div>
+    </div>
+
+    <div id="interviewStep" style="display:none;">
+      <div class="question-box">
+        <p id="questionText"></p>
+      </div>
+      <p id="statusText"></p>
+
+      <div class="controls">
+        <button id="startBtn">Start Interview</button>
+        <button id="recordBtn" style="display:none;">Start Recording</button>
+        <button id="stopBtn" style="display:none;">Stop &amp; Submit</button>
+        <div class="mic-ring" id="micRing"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TOTAL_QUESTIONS = 5;
+    const IDLE_LIMIT_SECONDS = 180; // auto-skip if no recording started in time
+
+    const card = document.getElementById("card");
+    const uploadStep = document.getElementById("uploadStep");
+    const interviewStep = document.getElementById("interviewStep");
+    const resumeInput = document.getElementById("resumeInput");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const questionEl = document.getElementById("questionText");
+    const statusEl = document.getElementById("statusText");
+    const startBtn = document.getElementById("startBtn");
+    const recordBtn = document.getElementById("recordBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const micRing = document.getElementById("micRing");
+    const progressEl = document.getElementById("progress");
+
+    let turnIndex = 0;
+    let idleTimer = null;
+    let idleSecondsLeft = 0;
+
+    function renderProgress(current) {
+      progressEl.innerHTML = "";
+      for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+        const dot = document.createElement("div");
+        dot.className = "dot" + (i < current ? " done" : i === current ? " current" : "");
+        progressEl.appendChild(dot);
+      }
+    }
+    renderProgress(0);
+
+    uploadBtn.onclick = async () => {
+      if (!resumeInput.files.length) {
+        document.getElementById("status").textContent = "Choose a file first.";
+        return;
+      }
+      const formData = new FormData();
+      formData.append("resume", resumeInput.files[0]);
+      uploadBtn.disabled = true;
+      document.getElementById("status").textContent = "Uploading and parsing resume...";
+
+      await fetch("/upload-resume", { method: "POST", body: formData });
+
+      uploadStep.style.display = "none";
+      interviewStep.style.display = "block";
+    };
+
+    function startIdleTimer() {
+      clearInterval(idleTimer);
+      idleSecondsLeft = IDLE_LIMIT_SECONDS;
+      idleTimer = setInterval(() => {
+        idleSecondsLeft--;
+        const mins = Math.floor(idleSecondsLeft / 60);
+        const secs = idleSecondsLeft % 60;
+        statusEl.textContent = `The interviewer is speaking... (auto-skip in ${mins}:${secs.toString().padStart(2, "0")})`;
+        if (idleSecondsLeft <= 0) {
+          clearInterval(idleTimer);
+          skipQuestion();
+        }
+      }, 1000);
+    }
+
+    function stopIdleTimer() {
+      clearInterval(idleTimer);
+    }
+
+    async function skipQuestion() {
+      statusEl.textContent = "No response received — moving on...";
+      recordBtn.style.display = "none";
+      stopBtn.style.display = "none";
+      const res = await fetch("/skip-question", { method: "POST" });
+      const data = await res.json();
+      handleNextStep(data);
+    }
+
+    function handleNextStep(data) {
+      turnIndex++;
+      if (data.done) {
+        renderProgress(TOTAL_QUESTIONS);
+        renderReport(data.transcript);
+      } else {
+        questionEl.textContent = data.question;
+        recordBtn.style.display = "inline-block";
+        renderProgress(turnIndex);
+        startIdleTimer();
+      }
+    }
+
+    startBtn.onclick = async () => {
+      statusEl.textContent = "Starting...";
+      startBtn.disabled = true;
+      const res = await fetch("/start", { method: "POST" });
+      const data = await res.json();
+      questionEl.textContent = data.question;
+      startBtn.style.display = "none";
+      recordBtn.style.display = "inline-block";
+      renderProgress(0);
+      startIdleTimer();
+    };
+
+    recordBtn.onclick = async () => {
+      stopIdleTimer();
+      statusEl.textContent = "Recording — speak your answer now.";
+      micRing.classList.add("active");
+      await fetch("/start-recording", { method: "POST" });
+      recordBtn.style.display = "none";
+      stopBtn.style.display = "inline-block";
+    };
+
+    stopBtn.onclick = async () => {
+      statusEl.textContent = "Processing your answer...";
+      stopBtn.disabled = true;
+      micRing.classList.remove("active");
+
+      const res = await fetch("/stop-recording", { method: "POST" });
+      const data = await res.json();
+
+      stopBtn.disabled = false;
+      stopBtn.style.display = "none";
+      handleNextStep(data);
+    };
+
+    function renderReport(transcript) {
+      const avg = transcript.reduce((s, t) => s + t.score, 0) / transcript.length;
+
+      let html = `
+        <p class="eyebrow">Interview Complete</p>
+        <h1>Thank you.</h1>
+        <p style="color: var(--ink-muted); margin-bottom: 28px;">
+          Average relevance score: <strong style="color: var(--ink);">${avg.toFixed(1)}/10</strong>
+        </p>
+      `;
+
+      transcript.forEach((t, i) => {
+        html += `
+          <div class="turn">
+            <p class="turn-q">${i + 1}. ${t.question}</p>
+            <p class="turn-a">${t.answer || "(no answer recorded)"}</p>
+            <div class="score-track"><div class="score-fill" style="width:${t.score * 10}%"></div></div>
+            <p class="score-label">${t.score.toFixed(1)} / 10</p>
+          </div>
+        `;
+      });
+
+      card.innerHTML = `<div class="report">${html}</div>`;
+    }
+  </script>
+
+</body>
+</html>

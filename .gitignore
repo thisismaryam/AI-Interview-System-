@@ -1,0 +1,25 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variables (YOUR SECRET KEYS!)
+.env
+
+# Audio recordings (large temporary files)
+*.wav
+*.mp3
+
+# Uploaded resumes (temporary)
+uploads/
+
+# Interview reports
+interview_report.txt
+
+# VS Code settings (optional)
+.vscode/
+
+# Virtual environments
+venv/
+env/
+.venv/
