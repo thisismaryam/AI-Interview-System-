@@ -127,25 +127,17 @@ def _advance(answer):
         # Evaluate
         print("Evaluating answer...")
         state = evaluate(state)
-
-        # Check if done
         if state["done"]:
             print("Interview complete, finalizing...")
+            # <-- this adds "score" to each transcript entry
             state = finalize(state)
             return jsonify({
                 "done": True,
-                "overall_score": state.get("final_score", 0.0),
-                "topic_scores": state["final_scores"],
+                "overall_score": state["final_score"],   # <-- corrected key
                 "feedback": state["feedback"],
-                "transcript": [
-                    {
-                        "topic": g["topic"],
-                        "exchanges": g["exchanges"],
-                    }
-                    for g in state["groups"]
-                ],
+                # <-- each entry has question, answer, score
+                "transcript": state["transcript"],
             })
-
         # Ask next question
         print(" Asking next question...")
         state = ask_question(state)
