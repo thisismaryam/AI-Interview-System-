@@ -38,20 +38,17 @@ def upload_resume():
     if ext not in allowed_ext:
         return jsonify({"error": f"Unsupported file type: {ext}"}), 400
 
-    # Save file
     os.makedirs("uploads", exist_ok=True)
     save_path = os.path.join("uploads", filename)
     file.save(save_path)
 
     try:
-        # Parse resume
         resume_text = extract_resume_text(save_path)
-        print(f" Resume parsed: {len(resume_text)} characters")
+        print(f"✅ Resume parsed: {len(resume_text)} characters")
         return jsonify({"status": "ok", "message": "Resume uploaded successfully"})
     except Exception as e:
         return jsonify({"error": f"Failed to parse resume: {str(e)}"}), 400
     finally:
-        # Clean up
         if os.path.exists(save_path):
             os.remove(save_path)
 
@@ -63,14 +60,17 @@ def start():
     if not resume_text:
         return jsonify({"error": "Upload a resume first."}), 400
 
-    print(" Building initial state...")
+    print("🏗️ Building initial state...")
     state = build_initial_state(resume_text=resume_text)
 
-    print(" Asking first question...")
+    print("❓ Asking first question...")
     state = ask_question(state)
 
-    print(f" First question: {state['current_question'][:50]}...")
-    return jsonify({"question": state["current_question"], "done": False})
+    return jsonify({
+        "question": state["current_question"],
+        "audio_url": f"/static/audio/{state.get('current_audio', '')}" if state.get('current_audio') else None,
+        "done": False
+    })
 
 
 @app.route("/start-recording", methods=["POST"])
@@ -90,19 +90,16 @@ def stop_recording_route():
         return jsonify({"error": "No active interview"}), 400
 
     try:
-        # Stop recording and transcribe
         audio_path = stop_recording()
         answer = transcribe(audio_path).strip()
-        print(f" Transcribed: {answer}")
+        print(f"🎤 Transcribed: {answer}")
 
-        # Clean up audio file
         if os.path.exists(audio_path):
             os.remove(audio_path)
 
-        # Process answer
         return _advance(answer)
     except Exception as e:
-        print(f" Error in stop_recording: {e}")
+        print(f"Error in stop_recording: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -113,7 +110,7 @@ def skip_question_route():
     if not state:
         return jsonify({"error": "No active interview"}), 400
 
-    print("Skipping question (no response)")
+    print("⏭️ Skipping question (no response)")
     return _advance("")
 
 
@@ -121,37 +118,42 @@ def _advance(answer):
     global state
 
     try:
-        # Set answer
         state["current_answer"] = answer
 
-        # Evaluate
-        print("Evaluating answer...")
+        print(" Evaluating answer...")
         state = evaluate(state)
+
         if state["done"]:
-            print("Interview complete, finalizing...")
-            # <-- this adds "score" to each transcript entry
+            print(" Interview complete, finalizing...")
             state = finalize(state)
+
+            # Return the detailed scoring format
             return jsonify({
                 "done": True,
-                "overall_score": state["final_score"],   # <-- corrected key
+                "overall_score": state["final_score"],
                 "feedback": state["feedback"],
-                # <-- each entry has question, answer, score
-                "transcript": state["transcript"],
+                # Contains question_score, detailed_scores, justification
+                "transcript": state["transcript"]
             })
-        # Ask next question
+
         print(" Asking next question...")
         state = ask_question(state)
-        return jsonify({"question": state["current_question"], "done": False})
+
+        return jsonify({
+            "question": state["current_question"],
+            "audio_url": f"/static/audio/{state.get('current_audio', '')}" if state.get('current_audio') else None,
+            "done": False
+        })
 
     except Exception as e:
-        print(f" Error in _advance: {e}")
+        print(f"Error in _advance: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
-    # Create uploads folder if it doesn't exist
     os.makedirs("uploads", exist_ok=True)
-    print("Starting Flask server...")
+    os.makedirs("static/audio", exist_ok=True)
+    print(" Starting Flask server...")
     app.run(debug=True)

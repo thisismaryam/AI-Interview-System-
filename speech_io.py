@@ -17,7 +17,8 @@ load_dotenv()
 
 tts_client = ElevenLabs(api_key=os.getenv("ELEVENLABS_TTS_API_KEY"))
 stt_client = ElevenLabs(api_key=os.getenv("ELEVENLABS_STT_API_KEY"))
-VOICE_ID = "sRWQXpMySYOdNscPSiUm"  # free-tier accessible default voice
+VOICE_ID = "0SuGVMgHnvTR1BjC6j4u"  # free-tier accessible default voice
+# VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # Rachel (default, works on all accounts)
 
 
 def speak(text: str):
